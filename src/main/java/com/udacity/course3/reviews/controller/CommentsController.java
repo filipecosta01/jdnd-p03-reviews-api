@@ -1,10 +1,15 @@
 package com.udacity.course3.reviews.controller;
 
 import com.udacity.course3.reviews.entity.Comment;
+import com.udacity.course3.reviews.entity.CommentDocument;
 import com.udacity.course3.reviews.entity.Review;
+import com.udacity.course3.reviews.entity.ReviewDocument;
 import com.udacity.course3.reviews.repository.CommentRepository;
+import com.udacity.course3.reviews.repository.ReviewDocumentRepository;
 import com.udacity.course3.reviews.repository.ReviewRepository;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +30,9 @@ public class CommentsController {
     @Autowired
     ReviewRepository reviewRepository;
 
+    @Autowired
+    ReviewDocumentRepository reviewDocumentRepository;
+
     /**
      * Creates a comment for a review.
      *
@@ -37,7 +45,25 @@ public class CommentsController {
             return ResponseEntity.notFound().build();
         }
         comment.setReview(optionalReview.get());
-        return ResponseEntity.ok(commentRepository.save(comment));
+
+        Comment savedComment = commentRepository.save(comment);
+
+        Optional<ReviewDocument> optionalReviewDocument = reviewDocumentRepository.findById(reviewId);
+        if (optionalReviewDocument.isPresent()) {
+            final ReviewDocument reviewDocument = optionalReviewDocument.get();
+            final CommentDocument commentDocument = new CommentDocument();
+
+            commentDocument.setId(savedComment.getId());
+            commentDocument.setTitle(savedComment.getTitle());
+            commentDocument.setMessage(savedComment.getMessage());
+            commentDocument.setCreatedAt(savedComment.getCreatedAt() != null ? Date.from(savedComment.getCreatedAt().toInstant()) : Date.from(Instant.now()));
+
+            reviewDocument.getComments().add(commentDocument);
+
+            reviewDocumentRepository.save(reviewDocument);
+        }
+
+        return ResponseEntity.ok(savedComment);
     }
 
     /**
