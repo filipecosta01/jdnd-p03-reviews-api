@@ -5,7 +5,7 @@ Supports operations for writing reviews and listing reviews for a product but wi
 MySQL needs to be installed and configured.
 Default MySQL configuration was followed in this project, meaning that username is "root" without any password. Change "application.properties" file accordingly to your configurations.
 
-**Important**: Create a database named "ecommerce" before running the project. Check instructions online on how to do that.
+**Important**: Create a database named "ecommerce" for both mongodb and MySQL databases before running the project. Check instructions online on how to do that.
 Flyway is used to run migrations. The file for migration can be found in "resources/db/migration". It contains table creations plus all necessary constraints.
 
 ### Reference Documentation
